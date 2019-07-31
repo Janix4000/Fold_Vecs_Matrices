@@ -1,5 +1,6 @@
 #include "Vec.hpp"
 #include "Mat.hpp"
+#include "TransformMat.hpp"
 
 int main() {
 	Vec<2, float> vec2(12.f, 13.f);
@@ -16,5 +17,6 @@ int main() {
 				1.f, 0.f };
 
 	auto C = A * B;
+	auto D = TransformMat<2, float>::Rotation(3.1415f);
 	return 0;
 }
