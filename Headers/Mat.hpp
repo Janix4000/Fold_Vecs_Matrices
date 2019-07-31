@@ -6,7 +6,7 @@ struct Mat {
 	T cells[D][D];
 public:
 	/*Mat() {
-		*this = MakeEmpty();
+		*this = Empty();
 	}*/
 	T* operator[](size_t row) {
 		return cells[row];
@@ -30,23 +30,25 @@ public:
 	}
 
 
-	static Mat MakeUnit() {
-		return GetScaling(T(1));
+	static Mat Unit() {
+		return ImplUnit(std::make_index_sequence<D>());
 	}
 
 private:
-	template<size_t... Is>
-	static Mat MakeEmpty(std::index_sequence<Is>) {
+
+	static Mat Empty() {
 		Mat mat;
-		T* cellPtr = mat.cells;
-		((cellPtr++[Is] = T(0)), ...);
+		for (int row = 0; row < D; ++row) {
+			for (int col = 0; col < D; ++col) {
+				mat[row][col] = T(0);
+			}
+		}
+		return mat;
 	}
-	static Mat MakeEmpty() {
-		return MakeEmpty(std::make_index_sequence<D * D>());
-	}
+
 	template<size_t... Is>
-	static Mat MakeUnit(std::index_sequence<Is>) {
-		auto unit = MakeEmpty();
+	static Mat ImplUnit(std::index_sequence<Is...> idx) {
+		auto unit = Empty();
 		((unit[Is][Is] = T(1)), ...);
 		return unit;
 	}
