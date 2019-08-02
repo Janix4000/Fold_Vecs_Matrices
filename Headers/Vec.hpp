@@ -186,9 +186,9 @@ private:
 		return ((v[Is] == rhs[Is]), ...);
 	}
 	template<size_t... Is>
-	T imp_dot(const Vec& rhs, std::index_sequence<Is...>) {
-		auto& v = *this;
-		return ((v[Is] *= rhs[Is]) + ...);
+	T imp_dot(const Vec& rhs, std::index_sequence<Is...>) const {
+		const auto& v = *this;
+		return ((v[Is] * rhs[Is]) + ...);
 	}
 	template<size_t... Is>
 	T imp_lensq(std::index_sequence<Is...>) const {
