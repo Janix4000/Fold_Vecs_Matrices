@@ -1,6 +1,6 @@
 #pragma once
-#include "Vec.hpp"
 #include "Mat.hpp"
+#include "Vec.hpp"
 
 template <size_t D, typename T, typename TMat>
 class TMat_Unq_Methods : public Mat<D + 1, T>
@@ -26,8 +26,8 @@ public:
 template <size_t D, typename T>
 class TransformMat : public TMat_Unq_Methods<D, T, TransformMat<D, T>>
 {
-	using VecD = Vec<D, T>;
 	using MatD = Mat<D + 1, T>;
+	using VecD = Vec<D, T>;
 public:
 	/*TransformMat() {
 		*this = MatD::Unit();
@@ -39,11 +39,16 @@ public:
 			}
 		}
 	}
+
 	static TransformMat Translation(const VecD& translation) {
-		return Translation(VecD, std::make_index_sequence<D*D>());
+		return Translation(translation, std::make_index_sequence<D>());
 	}
 	static TransformMat Unit() {
 		return MatD::Unit();
+	}
+
+	VecD operator*(const VecD& vec) const {
+		return imp_muleqvec(vec, std::make_index_sequence<D>());
 	}
 
 private:
@@ -55,9 +60,22 @@ private:
 	}
 	template<size_t... Is>
 	static TransformMat Scaling(const T& scalar, std::index_sequence<Is...>) {
-		auto mat = MatD::Unit();
+		MatD mat;
 		((mat[Is][Is] = scalar), ...);
+		mat[D][D] = T(1.0);
 		return mat;
+	}
+
+	template<size_t... Is>
+	VecD imp_muleqvec(const VecD& vec, std::index_sequence<Is...>) const {
+		VecD vout;
+		const auto& mat = *this;
+		for (size_t row = 0; row < D; row++)
+		{
+			((vout[row] += vec[row] * mat[row][Is]), ...);
+			vout[row] += mat[row][D];
+		}
+		return vout;
 	}
 };
 
