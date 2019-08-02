@@ -111,7 +111,7 @@ public:
 		constexpr size_t nArgs = sizeof...(args);
 		static_assert(nArgs <= D, "Number of arguments in Vec constructor should not overflow dimension of the Vector");
 		static_assert((std::is_same_v<T, Args> && ...), "All arguments must be suited with type of Vector");
-		imp_assignArgs(std::make_tuple(args...), std::make_index_sequence<nArgs>());
+		imp_assignArgs(std::make_index_sequence<nArgs>(), args...);
 		fillFrom<nArgs>(T(0), std::make_index_sequence<D - nArgs>());
 	}
 
@@ -206,9 +206,9 @@ private:
 	}
 
 	template<typename... Args, size_t... Is>
-	void imp_assignArgs(std::tuple<Args...> args_tuple, std::index_sequence<Is...>) {
+	void imp_assignArgs(std::index_sequence<Is...>, Args... args) {
 		auto& v = *this;
-		( (v[Is] = std::get<Is>(args_tuple) ), ...);
+		( (v[Is] = args), ...);
 	}
 	template<size_t... Is>
 	Vec& imp_addeq(const Vec& rhs, std::index_sequence<Is...>) {
