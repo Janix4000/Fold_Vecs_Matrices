@@ -3,14 +3,12 @@
 #include "TransformMat.hpp"
 
 int main() {
-	Vec3 v3 = {12.f, 13.f, 14.f};
-	Vec2 v2 = v3;
-	Vec3 v = v2;
-	v = v3;
+	Vec3 v1 = { 1.f, 13.f, 43.f };
+	Vec3 v2 = { 1.f, 13.f, 43.f };
+	v1 += v2;
+	v1 -= v2;
+	v1 *= 1.3f;
+	v1 /= 1.3f;
 
-	TMat2 tt = TMat2::Translation(v2);
-	TMat2 ts = TMat2::Scaling(2.f);
-	auto t = ts * tt;
-	v2 = t * v2;
 	return 0;
 }
