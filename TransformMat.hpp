@@ -29,9 +29,9 @@ class TransformMat : public TMat_Unq_Methods<D, T, TransformMat<D, T>>
 	using MatD = Mat<D + 1, T>;
 	using VecD = Vec<D, T>;
 public:
-	/*TransformMat() {
+	TransformMat() {
 		*this = MatD::Unit();
-	}*/
+	}
 	TransformMat(const MatD& mat) {
 		for (int row = 0; row < D + 1; ++row) {
 			for (int col = 0; col < D + 1; ++col) {
@@ -40,8 +40,15 @@ public:
 		}
 	}
 
+	TransformMat operator*(const TransformMat& rhs) const {
+		return TransformMat(MatD::operator*(rhs));
+	}
+
 	static TransformMat Translation(const VecD& translation) {
 		return Translation(translation, std::make_index_sequence<D>());
+	}
+	static TransformMat Scaling(const T& scalar) {
+		return Scaling(scalar, std::make_index_sequence<D>());
 	}
 	static TransformMat Unit() {
 		return MatD::Unit();
@@ -54,15 +61,14 @@ public:
 private:
 	template<size_t... Is>
 	static TransformMat Translation(const VecD& translation, std::index_sequence<Is...>) {
-		auto mat = MatD::Unit();
+		auto mat = Unit();
 		((mat[Is][D] = translation[Is]), ...);
 		return mat;
 	}
 	template<size_t... Is>
 	static TransformMat Scaling(const T& scalar, std::index_sequence<Is...>) {
-		MatD mat;
+		TransformMat mat;
 		((mat[Is][Is] = scalar), ...);
-		mat[D][D] = T(1.0);
 		return mat;
 	}
 

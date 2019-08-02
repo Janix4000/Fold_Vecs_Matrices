@@ -7,8 +7,10 @@ int main() {
 	Vec2 v2 = v3;
 	Vec3 v = v2;
 	v = v3;
-	TMat2 t = TMat2::Translation(v2);
+
+	TMat2 tt = TMat2::Translation(v2);
+	TMat2 ts = TMat2::Scaling(2.f);
+	auto t = ts * tt;
 	v2 = t * v2;
-	//v2 = static_cast<Vec2>(v3);
 	return 0;
 }
