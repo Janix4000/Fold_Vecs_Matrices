@@ -5,7 +5,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include "VecRows.hpp"
+#include "Utility/VecRows.hpp"
 
 
 template<size_t D, typename T, typename VecD>
