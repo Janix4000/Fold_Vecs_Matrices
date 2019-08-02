@@ -108,35 +108,55 @@ class Vec : public Vec_Unq_Methods<D, T, Vec<D, T>> {
 public:
 	template<typename... Args>
 	Vec(Args... args) {
-		static_assert(sizeof...(args) <= D);
-		imp_assignArgs(std::make_tuple(args...), std::make_index_sequence<sizeof...(args)>());
+		constexpr size_t nArgs = sizeof...(args);
+		static_assert(nArgs <= D, "Number of arguments in Vec constructor should not overflow dimension of the Vector");
+		static_assert((std::is_same_v<T, Args> && ...), "All arguments must be suited with type of Vector");
+		imp_assignArgs(std::make_tuple(args...), std::make_index_sequence<nArgs>());
+		fillFrom<nArgs>(T(0), std::make_index_sequence<D - nArgs>());
 	}
+
+	template<size_t OtherD, typename OtherT>
+	Vec(Vec<OtherD, OtherT> other) {
+		if constexpr (OtherD < D) {
+			imp_assignLesserOther(other, std::make_index_sequence<OtherD>());
+			return;
+		}
+		if constexpr (OtherD > D) {
+			imp_assignOther(other, std::make_index_sequence<D>());
+			return;
+		}
+		imp_assignOther(other, std::make_index_sequence<D>());
+	}
+
+
+
+
 	Vec& operator+=(const Vec& rhs) {
 		return imp_addeq(rhs, std::make_index_sequence<D>());
 	}
 	Vec operator+(const Vec& rhs) const {
-		auto vec = *this;
+		auto& vec = *this;
 		return (vec += rhs);
 	}
 	Vec& operator-=(const Vec& rhs) {
 		return imp_subeq(rhs, std::make_index_sequence<D>());
 	}
 	Vec operator-(const Vec& rhs) const {
-		auto vec = *this;
+		auto& vec = *this;
 		return (vec -= rhs);
 	}
 	Vec& operator*=(const T& scalar) {
 		return imp_muleq(scalar, std::make_index_sequence<D>());
 	}
 	Vec operator*(const T& scalar) const {
-		auto vec = *this;
+		auto& vec = *this;
 		return (vec *= scalar);
 	}
 	Vec& operator/=(const T& scalar) {
 		return imp_diveq(scalar, std::make_index_sequence<D>());
 	}
 	Vec operator/(const T& scalar) const {
-		auto vec = *this;
+		auto& vec = *this;
 		return (vec /= scalar);
 	}
 	bool operator==(const Vec& rhs) const {
@@ -156,7 +176,7 @@ public:
 		operator/=(getLen());
 	}
 	Vec getNormalized() const {
-		auto vec = *this;
+		auto& vec = *this;
 		vec.normalize();
 		return vec;
 	}
@@ -167,6 +187,24 @@ public:
 		return getDot(rhs);
 	}
 private:
+
+	template<typename OtherT, size_t OtherD, size_t... Is>
+	void imp_assignOther(const Vec<OtherD, OtherT>& other, std::index_sequence<Is...>) {
+		auto& vec = *this;
+		((vec[Is] = static_cast<T>(other[Is])), ...);
+	}
+	template<typename OtherT, size_t OtherD, size_t... Is>
+	void imp_assignLesserOther(const Vec<OtherD, OtherT>& other, std::index_sequence<Is...> idx) {
+		imp_assignOther(other, idx);
+		fillFrom<OtherD>(T(0), std::make_index_sequence<D - OtherD>());
+	}
+
+	template<size_t I, size_t... Is>
+	void fillFrom(const T& filler, std::index_sequence<Is...>) {
+		auto& t = *this;
+		((t[Is + I] = filler), ...);
+	}
+
 	template<typename... Args, size_t... Is>
 	void imp_assignArgs(std::tuple<Args...> args_tuple, std::index_sequence<Is...>) {
 		auto& v = *this;
