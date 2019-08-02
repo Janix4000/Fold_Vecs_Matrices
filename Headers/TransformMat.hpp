@@ -16,8 +16,9 @@ public:
 	static TMat Rotation(float sinT, float cosT) {
 		auto rot = TMat::Unit();
 		rot[0][0] = cosT;
-		rot[0][1] = -sinT;
 		rot[1][0] = sinT;
+
+		rot[0][1] = -sinT;
 		rot[1][1] = cosT;
 		return rot;
 	}
@@ -32,10 +33,9 @@ public:
 	}
 	static TMat RotationZ(float sinT, float cosT) {
 		auto rot = TMat::Unit();
-		rot[0][0] = cosT;
-		rot[0][1] = -sinT;
-		rot[1][0] = sinT;
-		rot[1][1] = cosT;
+		rot[0][0] = cosT;	rot[0][1] = -sinT;
+
+		rot[1][0] = sinT;	rot[1][1] = cosT;
 		return rot;
 	}
 	static TMat RotationY(float angle) {
@@ -43,11 +43,9 @@ public:
 	}
 	static TMat RotationY(float sinT, float cosT) {
 		auto rot = TMat::Unit();
-		rot[0][0] = cosT;
-		rot[0][2] = -sinT;
+		rot[0][0] = cosT;	rot[0][2] = sinT;
 		
-		rot[2][0] = sinT;
-		rot[2][2] = cosT;
+		rot[2][0] = -sinT;	rot[2][2] = cosT;
 
 		return rot;
 	}
@@ -56,11 +54,9 @@ public:
 	}
 	static TMat RotationX(float sinT, float cosT) {
 		auto rot = TMat::Unit();
-		rot[1][1] = cosT;
-		rot[1][2] = sinT;
+		rot[1][1] = cosT;	rot[1][2] = -sinT;
 		
-		rot[2][1] = -sinT;
-		rot[2][2] = cosT;
+		rot[2][1] = sinT;	rot[2][2] = cosT;
 
 		return rot;
 	}
@@ -121,8 +117,9 @@ private:
 		const auto& mat = *this;
 		for (size_t row = 0; row < D; row++)
 		{
-			((vout[row] += vec[row] * mat[row][Is]), ...);
-			vout[row] += mat[row][D];
+			auto& coord = vout[row];
+			((coord += vec[Is] * mat[row][Is]), ...);
+			coord += mat[row][D];
 		}
 		return vout;
 	}
